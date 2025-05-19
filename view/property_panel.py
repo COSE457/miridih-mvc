@@ -90,10 +90,10 @@ class PropertyPanel(ttk.Frame):
     
     def show_multi_select_properties(self):
         # Show only common properties for multiple selected shapes
-        for entry in self.properties.values():
+        for key, entry in self.properties.items():
             entry.delete(0, tk.END)
-            entry.insert(0, "Multiple")
-        
+            if key != "text":  # text 속성은 "Multiple"로 표시하지 않음
+                entry.insert(0, "Multiple")
         # Keep checkboxes enabled for multi-select
         self.frame_var.set(False)
         self.shadow_var.set(False)

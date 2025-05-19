@@ -1,8 +1,13 @@
+import tkinter as tk
+from tkinter import PhotoImage, filedialog, simpledialog
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, Callable, Optional, List, Union
+import os
+import uuid
 
 class Shape(ABC):
     def __init__(self):
+        self.id = str(uuid.uuid4())
         self.x = 0
         self.y = 0
         self.width = 100
@@ -101,17 +106,23 @@ class Line(Shape):
         self.x2 += dw
         self.y2 += dh
 
-class Text(Shape):
-    def __init__(self):
-        super().__init__()
-        self.shape_type = "text"
+class Text:
+    def __init__(self, x: int, y: int, text: str, width: int = 100, height: int = 30):
+        self.id = str(uuid.uuid4())
+        self.x = x
+        self.y = y
+        self.text = text
         self.font = "Arial"
         self.font_size = 12
         self.text_color = "black"
-        
+        self.z_order = 0
+        self.selected = False
+        self.width = width
+        self.height = height
+
     def draw(self) -> Dict:
         return {
-            'type': self.shape_type,
+            'type': 'text',
             'x': self.x,
             'y': self.y,
             'text': self.text,
@@ -119,19 +130,28 @@ class Text(Shape):
             'font_size': self.font_size,
             'text_color': self.text_color,
             'z_order': self.z_order,
-            'selected': self.selected
+            'selected': self.selected,
+            'width': self.width,
+            'height': self.height
         }
 
-class Image(Shape):
-    def __init__(self):
-        super().__init__()
-        self.shape_type = "image"
-        self.image_path = ""
+class Image:
+    def __init__(self, x: int, y: int, width: int, height: int, image_path: str):
+        self.id = str(uuid.uuid4())
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.image_path = image_path
         self.preserve_aspect_ratio = True
-        
+        self.z_order = 0
+        self.has_frame = False  # Explicitly disable frame
+        self.has_shadow = False  # Explicitly disable shadow
+        self.selected = False
+    
     def draw(self) -> Dict:
         return {
-            'type': self.shape_type,
+            'type': 'image',
             'x': self.x,
             'y': self.y,
             'width': self.width,
@@ -142,4 +162,4 @@ class Image(Shape):
             'has_frame': self.has_frame,
             'has_shadow': self.has_shadow,
             'selected': self.selected
-        } 
+        }

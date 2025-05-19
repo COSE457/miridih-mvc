@@ -14,4 +14,4 @@ class ShapeFactory:
         shape_class = shape_types.get(shape_type.lower())
         if shape_class:
             return shape_class()
-        raise ValueError(f"Unknown shape type: {shape_type}") 
+        raise ValueError(f"Unknown shape type: {shape_type}")

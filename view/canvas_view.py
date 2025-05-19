@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import PhotoImage, filedialog
+from tkinter import PhotoImage, filedialog, simpledialog
 from typing import Callable, Optional, Tuple
 import os
 
@@ -24,7 +24,7 @@ class CanvasView(tk.Canvas):
     def set_shape_type(self, shape_type: str):
         self.current_shape_type = shape_type
         if shape_type == "text":
-            self.master.focus_set()  # Set focus to receive text input
+            self.master.focus_set()
         elif shape_type == "image":
             self.prompt_for_image()
     
@@ -40,23 +40,30 @@ class CanvasView(tk.Canvas):
                 except:
                     return None
     
+    def prompt_for_text(self):
+        return simpledialog.askstring("Input", "Enter text:")
+
     def on_click(self, event):
         if self.current_shape_type == "text":
-            # For text, create immediately on click
-            if self.shape_created_callback:
-                self.shape_created_callback(event.x, event.y, 100, 30)  # Default text box size
+            user_text = self.prompt_for_text()
+            if user_text and self.shape_created_callback:
+                self.shape_created_callback(
+                    event.x, event.y, 100, 30, 'text',  # shape_type = 'text'
+                    {'text': user_text}                # props dictionary
+                )
         elif self.current_shape_type == "image":
-            # For image, prompt for file and create
             file_path = self.prompt_for_image()
             if file_path and self.shape_created_callback:
-                self.shape_created_callback(event.x, event.y, 200, 200)  # Default image size
+                self.shape_created_callback(
+                    event.x, event.y, 200, 200, 'image',
+                    {'image_path': file_path}
+                )
         else:
             self.start_x = event.x
             self.start_y = event.y
-            
             if self.shape_selected_callback:
                 self.shape_selected_callback(event.x, event.y)
-    
+
     def on_multi_select(self, event):
         self.multi_select_mode = True
         if self.shape_selected_callback:
@@ -96,7 +103,7 @@ class CanvasView(tk.Canvas):
                     )
                 else:
                     self.shape_created_callback(
-                        x1, y1, x2-x1, y2-y1,
+                        x1, y1, x2 - x1, y2 - y1,
                         shape_type=self.current_shape_type
                     )
             self.delete("temp_shape")
@@ -139,7 +146,7 @@ class CanvasView(tk.Canvas):
             width=2 if props['has_frame'] else 1
         )
         
-        if props['text']:
+        if props['text'] and props['text'] != "Multiple":
             self._draw_shape_text(props)
     
     def _draw_ellipse(self, props, outline):
@@ -160,7 +167,7 @@ class CanvasView(tk.Canvas):
             width=2 if props['has_frame'] else 1
         )
         
-        if props['text']:
+        if props['text'] and props['text'] != "Multiple":
             self._draw_shape_text(props)
     
     def _draw_line(self, props, outline):
@@ -220,4 +227,4 @@ class CanvasView(tk.Canvas):
         self.shape_selected_callback = callback
     
     def set_shape_created_callback(self, callback: Callable):
-        self.shape_created_callback = callback 
+        self.shape_created_callback = callback
