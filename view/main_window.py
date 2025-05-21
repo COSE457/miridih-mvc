@@ -46,7 +46,8 @@ class MainWindow:
         self.toolbar = Toolbar(
             self.root,
             on_select_mode_changed=self.on_select_mode_changed,
-            on_shape_type_changed=self.on_shape_type_changed
+            on_shape_type_changed=self.on_shape_type_changed,
+            on_z_order_changed=self.on_z_order_changed
         )
         self.toolbar.pack(fill=tk.X, padx=5, pady=2)
     
@@ -76,6 +77,18 @@ class MainWindow:
         """Handle shape type selection change."""
         if not self.toolbar.get_select_mode():
             self.canvas_view.set_shape_type(shape_type.lower())
+    
+    def on_z_order_changed(self, action):
+        """Handle z-order changes."""
+        if hasattr(self, 'canvas_view') and hasattr(self.canvas_view, 'canvas_controller'):
+            if action == "front":
+                self.canvas_view.canvas_controller.bring_to_front()
+            elif action == "back":
+                self.canvas_view.canvas_controller.send_to_back()
+            elif action == "forward":
+                self.canvas_view.canvas_controller.bring_forward()
+            elif action == "backward":
+                self.canvas_view.canvas_controller.send_backward()
     
     def start(self):
         """Start the application main loop."""

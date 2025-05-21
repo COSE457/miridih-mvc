@@ -24,7 +24,7 @@ class CanvasController:
                 clicked_shape = shape
                 break
         
-        # If check_only is True, just return whether the clicked shape is selected
+        # shape 선택 여부 확인 용도
         if check_only:
             if clicked_shape and clicked_shape in self.canvas.selected_shapes:
                 return {'is_selected': True, 'shape': clicked_shape}
@@ -53,45 +53,45 @@ class CanvasController:
             self.canvas.select_shapes([])
             self.property_panel.clear_properties()
     
+
     def on_shape_drag(self, dx: int, dy: int):
-        # Move all selected shapes by dx, dy
+        # 선택된 도형들을 dx, dy 만큼 이동
         for shape in self.canvas.selected_shapes:
             shape.move(dx, dy)
         
-        # Update the property panel if a single shape is selected
+        # 선택된 도형이 1개인 경우 속성 패널 업데이트
         if len(self.canvas.selected_shapes) == 1:
             self.property_panel.update_properties(self.canvas.selected_shapes[0].draw())
         
-        # Notify observers to redraw the canvas
+        # 캔버스 다시 그리기
         self.canvas.notify_observers()
     
     def on_shape_created(self, x: int, y: int, width: int, height: int, shape_type: str = "rectangle", props: dict = None):
         if shape_type == "text" and props and 'text' in props:
-            # Create text shape with x, y, and text
+            # 텍스트 도형 생성
             shape = ShapeFactory.create_shape(shape_type, x=x, y=y, text=props['text'])
-            # Apply current font settings from property panel
+            # 현재 폰트 설정 적용
             shape.font = self.property_panel.font_var.get()
             shape.font_size = int(self.property_panel.font_size_var.get())
             shape.text_color = self.property_panel.color_var.get()
         elif shape_type == "image" and props and 'image_path' in props:
-            # Create image shape with x, y, and image_path
+            # 이미지 도형 생성
             shape = ShapeFactory.create_shape(shape_type, x=x, y=y, image_path=props['image_path'])
         else:
-            # Create other shapes
+            # 기타 도형 생성
             shape = ShapeFactory.create_shape(shape_type)
         
-        # Set position and size (skip x, y for text and image since they're set in create_shape)
+        # 위치와 크기 설정 (텍스트와 이미지는 create_shape에서 설정됨)
         if shape_type not in ["text", "image"]:
             shape.x = x
             shape.y = y
         if shape_type == "line":
-            shape.x2 = width  # width parameter is actually x2 for lines
-            shape.y2 = height  # height parameter is actually y2 for lines
+            shape.x2 = width
+            shape.y2 = height 
         else:
             shape.width = width
             shape.height = height
         
-        # Apply additional properties from props dictionary, if provided
         if props:
             for key, value in props.items():
                 if key not in ['text', 'image_path']:  # Skip text/image_path since they're set

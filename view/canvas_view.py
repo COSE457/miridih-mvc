@@ -39,6 +39,39 @@ class CanvasView(tk.Canvas):
                 return None
         return None
     
+    def _draw_shadow(self, props, shape_type='rectangle'):
+        """Helper method to draw shadows for shapes.
+        
+        Args:
+            props: Shape properties dictionary
+            shape_type: Type of shape ('rectangle', 'ellipse', or 'image')
+        """
+        shadow_color = 'gray'
+        shadow_steps = 0
+        
+        for i in range(shadow_steps):
+            alpha = 0.3 - (i * 0.1)  # Decreasing opacity
+            if shape_type == 'ellipse':
+                self.create_oval(
+                    props['x'] + i,
+                    props['y'] + i,
+                    props['x'] + props['width'] + i,
+                    props['y'] + props['height'] + i,
+                    fill=shadow_color,
+                    stipple='gray50',
+                    tags=('shadow',)
+                )
+            else:  # rectangle or image
+                self.create_rectangle(
+                    props['x'] + i,
+                    props['y'] + i,
+                    props['x'] + props['width'] + i,
+                    props['y'] + props['height'] + i,
+                    fill=shadow_color,
+                    stipple='gray50',
+                    tags=('shadow',)
+                )
+    
     def _draw_image(self, props):
         image_path = props['image_path']
         if image_path and os.path.exists(image_path):
@@ -50,12 +83,7 @@ class CanvasView(tk.Canvas):
                     return
             
             if props['has_shadow']:
-                self.create_rectangle(
-                    props['x'] + 5, props['y'] + 5,
-                    props['x'] + props['width'] + 5,
-                    props['y'] + props['height'] + 5,
-                    fill='gray', stipple='gray50'
-                )
+                self._draw_shadow(props, 'image')
             
             try:
                 self.create_image(
@@ -222,12 +250,7 @@ class CanvasView(tk.Canvas):
     
     def _draw_rectangle(self, props, outline):
         if props['has_shadow']:
-            self.create_rectangle(
-                props['x'] + 5, props['y'] + 5,
-                props['x'] + props['width'] + 5,
-                props['y'] + props['height'] + 5,
-                fill='gray', stipple='gray50'
-            )
+            self._draw_shadow(props, 'rectangle')
         
         self.create_rectangle(
             props['x'], props['y'],
@@ -243,12 +266,7 @@ class CanvasView(tk.Canvas):
     
     def _draw_ellipse(self, props, outline):
         if props['has_shadow']:
-            self.create_oval(
-                props['x'] + 5, props['y'] + 5,
-                props['x'] + props['width'] + 5,
-                props['y'] + props['height'] + 5,
-                fill='gray', stipple='gray50'
-            )
+            self._draw_shadow(props, 'ellipse')
         
         self.create_oval(
             props['x'], props['y'],
@@ -286,12 +304,7 @@ class CanvasView(tk.Canvas):
                 self.images[props['image_path']] = PhotoImage(file=props['image_path'])
             
             if props['has_shadow']:
-                self.create_rectangle(
-                    props['x'] + 5, props['y'] + 5,
-                    props['x'] + props['width'] + 5,
-                    props['y'] + props['height'] + 5,
-                    fill='gray', stipple='gray50'
-                )
+                self._draw_shadow(props, 'image')
             
             self.create_image(
                 props['x'], props['y'],
