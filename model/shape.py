@@ -105,20 +105,19 @@ class Line(Shape):
     def resize(self, dw: int, dh: int) -> None:
         self.x2 += dw
         self.y2 += dh
-
-class Text:
+class Text(Shape):  # Inherit from Shape if applicable
     def __init__(self, x: int, y: int, text: str, width: int = 100, height: int = 30):
-        self.id = str(uuid.uuid4())
+        super().__init__()  # Call base class __init__ if inheriting
         self.x = x
         self.y = y
         self.text = text
         self.font = "Arial"
         self.font_size = 12
         self.text_color = "black"
-        self.z_order = 0
-        self.selected = False
         self.width = width
         self.height = height
+        self.z_order = 0
+        self.selected = False
 
     def draw(self) -> Dict:
         return {
@@ -135,20 +134,34 @@ class Text:
             'height': self.height
         }
 
+    def set_property(self, property_name: str, value):
+        if property_name == 'text':
+            self.text = value
+        elif property_name == 'font':
+            self.font = value
+        elif property_name == 'font_size':
+            self.font_size = int(value)
+        elif property_name == 'text_color':
+            self.text_color = value
+        elif property_name in ['x', 'y', 'width', 'height', 'z_order']:
+            setattr(self, property_name, int(value))
+        elif property_name == 'selected':
+            self.selected = value
+            
+
 class Image:
-    def __init__(self, x: int, y: int, width: int, height: int, image_path: str):
+    def __init__(self, x: int, y: int, image_path: str, width: int = 200, height: int = 200):
         self.id = str(uuid.uuid4())
         self.x = x
         self.y = y
+        self.image_path = image_path
         self.width = width
         self.height = height
-        self.image_path = image_path
-        self.preserve_aspect_ratio = True
+        self.has_shadow = False
+        self.has_frame = False
         self.z_order = 0
-        self.has_frame = False  # Explicitly disable frame
-        self.has_shadow = False  # Explicitly disable shadow
         self.selected = False
-    
+
     def draw(self) -> Dict:
         return {
             'type': 'image',
@@ -157,9 +170,20 @@ class Image:
             'width': self.width,
             'height': self.height,
             'image_path': self.image_path,
-            'preserve_aspect_ratio': self.preserve_aspect_ratio,
-            'z_order': self.z_order,
-            'has_frame': self.has_frame,
             'has_shadow': self.has_shadow,
+            'has_frame': self.has_frame,
+            'z_order': self.z_order,
             'selected': self.selected
         }
+
+    def set_property(self, property_name: str, value):
+        if property_name == 'image_path':
+            self.image_path = value
+        elif property_name == 'has_shadow':
+            self.has_shadow = value
+        elif property_name == 'has_frame':
+            self.has_frame = value
+        elif property_name in ['x', 'y', 'width', 'height', 'z_order']:
+            setattr(self, property_name, int(value))
+        elif property_name == 'selected':
+            self.selected = value

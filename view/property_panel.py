@@ -127,3 +127,5 @@ class PropertyPanel(ttk.Frame):
     
     def set_property_changed_callback(self, callback):
         self.property_changed_callback = callback 
+
+        
