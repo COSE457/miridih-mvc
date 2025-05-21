@@ -14,13 +14,67 @@ class CanvasView(tk.Canvas):
         self.start_x = None
         self.start_y = None
         self.current_shape = None
-        self.current_shape_type = "rectangle"  # Default shape type
+        self.current_shape_type = "rectangle"
         self.multi_select_mode = False
+        self.dragging_shape = False
+        self.drag_start_x = None
+        self.drag_start_y = None
+        self.shape_drag_callback = None
         
         self.shape_selected_callback = None
         self.shape_created_callback = None
         self.images = {}  # Store PhotoImage objects
     
+    def prompt_for_image(self):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Image files", "*.png *.jpg *.jpeg *.gif *.bmp")]
+        )
+        if file_path:
+            try:
+                # Store the PhotoImage in self.images
+                self.images[file_path] = PhotoImage(file=file_path)
+                return file_path
+            except Exception as e:
+                print(f"Error loading image {file_path}: {e}")
+                return None
+        return None
+    
+    def _draw_image(self, props):
+        image_path = props['image_path']
+        if image_path and os.path.exists(image_path):
+            if image_path not in self.images:
+                try:
+                    self.images[image_path] = PhotoImage(file=image_path)
+                except Exception as e:
+                    print(f"Error loading image {image_path}: {e}")
+                    return
+            
+            if props['has_shadow']:
+                self.create_rectangle(
+                    props['x'] + 5, props['y'] + 5,
+                    props['x'] + props['width'] + 5,
+                    props['y'] + props['height'] + 5,
+                    fill='gray', stipple='gray50'
+                )
+            
+            try:
+                self.create_image(
+                    props['x'], props['y'],
+                    image=self.images[image_path],
+                    anchor='nw'
+                )
+            except Exception as e:
+                print(f"Error drawing image {image_path}: {e}")
+            
+            if props['has_frame']:
+                self.create_rectangle(
+                    props['x'], props['y'],
+                    props['x'] + props['width'],
+                    props['y'] + props['height'],
+                    outline='black',
+                    width=2
+                )
+        
     def set_shape_type(self, shape_type: str):
         self.current_shape_type = shape_type
         if shape_type == "text":
@@ -44,12 +98,36 @@ class CanvasView(tk.Canvas):
         return simpledialog.askstring("Input", "Enter text:")
 
     def on_click(self, event):
+        # In select mode, only handle selection and dragging
+        if self.current_shape_type == "select":
+            if self.shape_selected_callback:
+                result = self.shape_selected_callback(event.x, event.y, check_only=True)
+                if result and result.get('is_selected', False):
+                    # If clicking on a selected shape, start dragging
+                    self.dragging_shape = True
+                    self.drag_start_x = event.x
+                    self.drag_start_y = event.y
+                else:
+                    # Just select the shape
+                    self.shape_selected_callback(event.x, event.y)
+            return
+
+        # For other modes, check if we're clicking on a selected shape first
+        if self.shape_selected_callback:
+            result = self.shape_selected_callback(event.x, event.y, check_only=True)
+            if result and result.get('is_selected', False):
+                self.dragging_shape = True
+                self.drag_start_x = event.x
+                self.drag_start_y = event.y
+                return
+
+        # Create new shapes only if not in select mode and not clicking on existing shapes
         if self.current_shape_type == "text":
             user_text = self.prompt_for_text()
             if user_text and self.shape_created_callback:
                 self.shape_created_callback(
-                    event.x, event.y, 100, 30, 'text',  # shape_type = 'text'
-                    {'text': user_text}                # props dictionary
+                    event.x, event.y, 100, 30, 'text',
+                    {'text': user_text}
                 )
         elif self.current_shape_type == "image":
             file_path = self.prompt_for_image()
@@ -61,8 +139,6 @@ class CanvasView(tk.Canvas):
         else:
             self.start_x = event.x
             self.start_y = event.y
-            if self.shape_selected_callback:
-                self.shape_selected_callback(event.x, event.y)
 
     def on_multi_select(self, event):
         self.multi_select_mode = True
@@ -70,7 +146,19 @@ class CanvasView(tk.Canvas):
             self.shape_selected_callback(event.x, event.y, multi_select=True)
     
     def on_drag(self, event):
-        if self.start_x is not None and self.start_y is not None:
+        if self.dragging_shape:
+            # Calculate the delta movement
+            dx = event.x - self.drag_start_x
+            dy = event.y - self.drag_start_y
+            
+            # Update the drag start position for the next movement
+            self.drag_start_x = event.x
+            self.drag_start_y = event.y
+            
+            # Call the callback to move the selected shapes
+            if self.shape_drag_callback:
+                self.shape_drag_callback(dx, dy)
+        elif self.start_x is not None and self.start_y is not None and self.current_shape_type != "select":
             self.delete("temp_shape")
             if self.current_shape_type == "line":
                 self.create_line(
@@ -89,7 +177,11 @@ class CanvasView(tk.Canvas):
                 )
     
     def on_release(self, event):
-        if self.current_shape_type not in ["text", "image"] and self.start_x is not None and self.start_y is not None:
+        if self.dragging_shape:
+            self.dragging_shape = False
+            self.drag_start_x = None
+            self.drag_start_y = None
+        elif self.current_shape_type not in ["text", "image"] and self.start_x is not None and self.start_y is not None:
             if self.shape_created_callback:
                 x1, y1 = min(self.start_x, event.x), min(self.start_y, event.y)
                 x2, y2 = max(self.start_x, event.x), max(self.start_y, event.y)
@@ -228,3 +320,6 @@ class CanvasView(tk.Canvas):
     
     def set_shape_created_callback(self, callback: Callable):
         self.shape_created_callback = callback
+        
+    def set_shape_drag_callback(self, callback: Callable):
+        self.shape_drag_callback = callback
