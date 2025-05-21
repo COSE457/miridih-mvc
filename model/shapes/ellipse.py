@@ -2,20 +2,13 @@ from typing import Dict, Any
 from ..base_shape import BaseShape
 
 class Ellipse(BaseShape):
-    """Ellipse shape implementation."""
+    """타원 생성"""
     
     def __init__(self):
-        """Initialize ellipse shape."""
         super().__init__()
         self.shape_type = "ellipse"
     
     def draw(self) -> Dict[str, Any]:
-        """
-        Draw the ellipse and return its properties.
-        
-        Returns:
-            Dict containing ellipse properties
-        """
         return {
             'type': self.shape_type,
             'x': self.x,

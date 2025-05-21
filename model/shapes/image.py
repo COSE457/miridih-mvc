@@ -2,19 +2,9 @@ from typing import Dict, Any
 from ..base_shape import BaseShape
 
 class Image(BaseShape):
-    """Image shape implementation."""
+    """이미지 생성"""
     
     def __init__(self, x: int, y: int, image_path: str, width: int = 200, height: int = 200):
-        """
-        Initialize image shape.
-        
-        Args:
-            x: X coordinate
-            y: Y coordinate
-            image_path: Path to the image file
-            width: Width of image
-            height: Height of image
-        """
         super().__init__()
         self.x = x
         self.y = y
@@ -27,12 +17,6 @@ class Image(BaseShape):
         self.selected = False
     
     def draw(self) -> Dict[str, Any]:
-        """
-        Draw the image and return its properties.
-        
-        Returns:
-            Dict containing image properties
-        """
         return {
             'type': 'image',
             'x': self.x,
@@ -47,13 +31,6 @@ class Image(BaseShape):
         }
     
     def set_property(self, property_name: str, value: Any) -> None:
-        """
-        Set a property of the image shape.
-        
-        Args:
-            property_name: Name of the property
-            value: Value to set
-        """
         if property_name == 'image_path':
             self.image_path = value
         elif property_name == 'has_shadow':

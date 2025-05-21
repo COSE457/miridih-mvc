@@ -4,12 +4,11 @@ import uuid
 
 class BaseShape(ABC):
     """
-    Abstract base class for all shapes in the application.
-    Defines common properties and methods for all shapes.
+    모든 도형의 기본 클래스
     """
     
     def __init__(self):
-        """Initialize common shape properties."""
+        """기본 도형 속성 init"""
         self.id = str(uuid.uuid4())
         self.x = 0
         self.y = 0
@@ -25,55 +24,32 @@ class BaseShape(ABC):
     
     @abstractmethod
     def draw(self) -> Dict[str, Any]:
-        """
-        Draw the shape and return its properties.
-        
-        Returns:
-            Dict containing shape properties for drawing
-        """
+        """도형 생성 및 도형 속성 반환"""
         pass
     
     def set_property(self, name: str, value: Any) -> None:
         """
-        Set a property of the shape.
-        
-        Args:
-            name: Name of the property
-            value: Value to set
+        도형의 속성 설정
         """
         if hasattr(self, name):
             setattr(self, name, value)
     
     def get_property(self, name: str) -> Any:
         """
-        Get a property of the shape.
-        
-        Args:
-            name: Name of the property
-            
-        Returns:
-            Value of the property
+        도형 속성 반환
         """
         return getattr(self, name, None)
     
     def move(self, dx: int, dy: int) -> None:
         """
-        Move the shape by the given delta.
-        
-        Args:
-            dx: Change in x position
-            dy: Change in y position
+        도형 이동
         """
         self.x += dx
         self.y += dy
     
     def resize(self, dw: int, dh: int) -> None:
         """
-        Resize the shape by the given delta.
-        
-        Args:
-            dw: Change in width
-            dh: Change in height
+        도형 사이즈 조정
         """
         self.width = max(10, self.width + dw)
         self.height = max(10, self.height + dh) 

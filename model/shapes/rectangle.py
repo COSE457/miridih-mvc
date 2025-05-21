@@ -2,20 +2,14 @@ from typing import Dict, Any
 from ..base_shape import BaseShape
 
 class Rectangle(BaseShape):
-    """Rectangle shape implementation."""
+    """사각형 생성"""
     
     def __init__(self):
-        """Initialize rectangle shape."""
         super().__init__()
         self.shape_type = "rectangle"
     
     def draw(self) -> Dict[str, Any]:
-        """
-        Draw the rectangle and return its properties.
-        
-        Returns:
-            Dict containing rectangle properties
-        """
+
         return {
             'type': self.shape_type,
             'x': self.x,

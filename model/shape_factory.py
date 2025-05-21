@@ -6,27 +6,26 @@ from .shapes.image import Image
 
 class ShapeFactory:
     """
-    Factory class for creating different types of shapes.
-    Provides a centralized way to create shape instances.
+    도형 생성을 위한 팩토리 클래스
     """
     
     @staticmethod
     def create_shape(shape_type: str, x: int = 0, y: int = 0, text: str = None, image_path: str = None):
         """
-        Create a new shape instance.
+        도형 인스턴스 생성
         
         Args:
-            shape_type: Type of shape to create
-            x: X coordinate (for text and image)
-            y: Y coordinate (for text and image)
-            text: Text content (for text shape)
-            image_path: Path to image file (for image shape)
+            shape_type: 생성할 도형 타입
+            x: X 좌표 (텍스트, 이미지용)
+            y: Y 좌표 (텍스트, 이미지용)
+            text: 텍스트 내용 (텍스트 도형용)
+            image_path: 이미지 파일 경로 (이미지 도형용)
             
         Returns:
-            New shape instance
+            새로운 도형 인스턴스
             
         Raises:
-            ValueError: If shape type is unknown or required parameters are missing
+            ValueError: 알 수 없는 도형 타입이거나 필수 args가 누락된 경우
         """
         shape_types = {
             "rectangle": Rectangle,
@@ -49,4 +48,4 @@ class ShapeFactory:
                 raise ValueError("Image shape requires an 'image_path' argument")
             return shape_class(x, y, image_path)
         else:
-            return shape_class()  # No arguments for rectangle, ellipse, line
+            return shape_class()

@@ -2,19 +2,9 @@ from typing import Dict, Any
 from ..base_shape import BaseShape
 
 class Text(BaseShape):
-    """Text shape implementation."""
+    """텍스트 생성"""
     
     def __init__(self, x: int, y: int, text: str, width: int = 100, height: int = 30):
-        """
-        Initialize text shape.
-        
-        Args:
-            x: X coordinate
-            y: Y coordinate
-            text: Text content
-            width: Width of text area
-            height: Height of text area
-        """
         super().__init__()
         self.x = x
         self.y = y
@@ -28,12 +18,7 @@ class Text(BaseShape):
         self.selected = False
     
     def draw(self) -> Dict[str, Any]:
-        """
-        Draw the text and return its properties.
-        
-        Returns:
-            Dict containing text properties
-        """
+
         return {
             'type': 'text',
             'x': self.x,
@@ -49,13 +34,6 @@ class Text(BaseShape):
         }
     
     def set_property(self, property_name: str, value: Any) -> None:
-        """
-        Set a property of the text shape.
-        
-        Args:
-            property_name: Name of the property
-            value: Value to set
-        """
         if property_name == 'text':
             self.text = value
         elif property_name == 'font':
