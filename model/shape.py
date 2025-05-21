@@ -6,6 +6,7 @@ import os
 import uuid
 
 class Shape(ABC):
+    # 기본값
     def __init__(self):
         self.id = str(uuid.uuid4())
         self.x = 0
@@ -102,9 +103,6 @@ class Line(Shape):
             'outline': self.outline
         }
         
-    def resize(self, dw: int, dh: int) -> None:
-        self.x2 += dw
-        self.y2 += dh
 class Text(Shape):  # Inherit from Shape if applicable
     def __init__(self, x: int, y: int, text: str, width: int = 100, height: int = 30):
         super().__init__()  # Call base class __init__ if inheriting
