@@ -1,5 +1,5 @@
 from typing import List, Optional
-from .shape import Shape
+from .base_shape import BaseShape
 
 class Canvas:
     _instance = None
@@ -12,21 +12,21 @@ class Canvas:
             cls._instance.observers = []
         return cls._instance
     
-    def add_shape(self, shape: Shape) -> None:
+    def add_shape(self, shape: BaseShape) -> None:
         self.shapes.append(shape)
         self.notify_observers()
     
-    def remove_shape(self, shape: Shape) -> None:
+    def remove_shape(self, shape: BaseShape) -> None:
         if shape in self.shapes:
             self.shapes.remove(shape)
             if shape in self.selected_shapes:
                 self.selected_shapes.remove(shape)
             self.notify_observers()
     
-    def get_shapes(self) -> List[Shape]:
+    def get_shapes(self) -> List[BaseShape]:
         return sorted(self.shapes, key=lambda x: x.z_order)
     
-    def select_shapes(self, shapes: List[Shape]) -> None:
+    def select_shapes(self, shapes: List[BaseShape]) -> None:
         for shape in self.selected_shapes:
             shape.selected = False
         self.selected_shapes = shapes

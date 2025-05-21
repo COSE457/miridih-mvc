@@ -4,10 +4,12 @@ from model.shape_factory import ShapeFactory
 class CanvasController:
     
     def __init__(self, canvas_view, property_panel):
+        """
+        기본값
+        """
         self.canvas = Canvas()
         self.canvas_view = canvas_view
         self.property_panel = property_panel
-        
         self.canvas.add_observer(self)
         self.canvas_view.set_shape_selected_callback(self.on_canvas_click)
         self.canvas_view.set_shape_created_callback(self.on_shape_created)

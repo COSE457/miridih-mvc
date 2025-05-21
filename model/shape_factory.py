@@ -1,5 +1,8 @@
-from .basic_shapes import Rectangle, Ellipse, Line
-from .special_shapes import Text, Image
+from .shapes.rectangle import Rectangle
+from .shapes.ellipse import Ellipse
+from .shapes.line import Line
+from .shapes.text import Text
+from .shapes.image import Image
 
 class ShapeFactory:
     """
