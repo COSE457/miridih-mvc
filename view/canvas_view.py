@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import PhotoImage, filedialog, simpledialog
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, List
 import os
+from model.shape_composite import ShapeComponent, ShapeGroup
 
 class CanvasView(tk.Canvas):
     def __init__(self, master):
@@ -24,6 +25,7 @@ class CanvasView(tk.Canvas):
         self.shape_selected_callback = None
         self.shape_created_callback = None
         self.images = {}  # Store PhotoImage objects
+        self.selected_group = ShapeGroup()  # Track selected shapes as a group
     
     def prompt_for_image(self):
         file_path = filedialog.askopenfilename(
@@ -40,12 +42,7 @@ class CanvasView(tk.Canvas):
         return None
     
     def _draw_shadow(self, props, shape_type='rectangle'):
-        """Helper method to draw shadows for shapes.
         
-        Args:
-            props: Shape properties dictionary
-            shape_type: Type of shape ('rectangle', 'ellipse', or 'image')
-        """
         shadow_color = 'gray'
         shadow_steps = 0
         
@@ -61,7 +58,7 @@ class CanvasView(tk.Canvas):
                     stipple='gray50',
                     tags=('shadow',)
                 )
-            else:  # rectangle or image
+            else: 
                 self.create_rectangle(
                     props['x'] + i,
                     props['y'] + i,
@@ -137,6 +134,8 @@ class CanvasView(tk.Canvas):
                     self.drag_start_y = event.y
                 else:
                     # Just select the shape
+                    if not self.multi_select_mode:
+                        self.selected_group.deselect()  # Clear previous selection
                     self.shape_selected_callback(event.x, event.y)
             return
 
@@ -183,7 +182,10 @@ class CanvasView(tk.Canvas):
             self.drag_start_x = event.x
             self.drag_start_y = event.y
             
-            # Call the callback to move the selected shapes
+            # Move all selected shapes
+            self.selected_group.move(dx, dy)
+            
+            # Call the callback to update the view
             if self.shape_drag_callback:
                 self.shape_drag_callback(dx, dy)
         elif self.start_x is not None and self.start_y is not None and self.current_shape_type != "select":
